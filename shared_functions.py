@@ -1,6 +1,13 @@
 import random
 import copy
 
+def print_board_state(board_state):
+
+    for row in board_state:
+        print(' '.join(row))
+
+    print("---------------")
+
 # Generate a random board state representing num_queens queens with '1' and empty spaces with '0'
 def generate_random_state(num_queens):
 

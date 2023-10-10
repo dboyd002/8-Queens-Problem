@@ -47,13 +47,6 @@ def find_most_fit_state(initial_state):
 
     return state_changed, most_fit_state, most_fit_state_value
 
-def print_board_state(board_state):
-
-    for row in board_state:
-        print(' '.join(row))
-
-    print("---------------")
-
 # Returns True if a solution was found
 def hill_climbing_search(num_queens, do_print):
 
@@ -74,12 +67,12 @@ def hill_climbing_search(num_queens, do_print):
      if do_print:
 
           # Print the intitial state
-          print_board_state(state_to_check)
+          shared_functions.print_board_state(state_to_check)
           print("Fitness: " + str(shared_functions.evaluate_pairwise_fitness(state_to_check)) + '\n')
           print("^^INITIAL STATE^^\n")
 
           # Print the final state
-          print_board_state(state_to_check)
+          shared_functions.print_board_state(state_to_check)
           print("Fitness: " + str(state_to_check_fitness_value))
           print("\n^^FINAL STATE^^\n")
 
