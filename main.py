@@ -29,49 +29,38 @@ def generate_random_state(num_queens):
 
     return random_state
 
+# Returns true if a move to a given index is within the bounds of the board
 def is_valid_index(row, col):
     return 0 <= row < 8 and 0 <= col < 8
 
-# Generates the set of neighbor states from a given state
+# Generates the set of neighbor states from a given state; all legal moves column-wise
 def generate_neighbor_states(board_state):
-     
-     neighbor_states_set = []
-     
-     for col in range(8):
-          
-          for row in range(8):
-               
-               if board_state[row][col] == '1':
-                    
-                    neighbor_board_state = copy.deepcopy(board_state)
+    
+    neighbor_states_set = []
 
-                    up_counter = 0
-                    while is_valid_index(row - up_counter - 1, col):
-                         
-                         if neighbor_board_state[row - up_counter - 1][col] == '0':
+    for col in range(8):
+        
+        for row in range(8):
+            
+            if board_state[row][col] == '1':
+                
+                for new_row in range(8):
 
-                            neighbor_board_state[row - up_counter][col] = '0'
-                            neighbor_board_state[row - up_counter - 1][col] = '1'
-                            neighbor_states_set.append(neighbor_board_state)
+                    if new_row != row and board_state[new_row][col] != '1':
+                        
+                        neighbor_board_state = copy.deepcopy(board_state)
+                        neighbor_board_state[row][col] = '0'
+                        neighbor_board_state[new_row][col] = '1'
+                        neighbor_states_set.append(neighbor_board_state)
 
-                         up_counter += 1
+    return neighbor_states_set
 
-                    down_counter = 0
-                    while is_valid_index(row + down_counter + 1, col):
-                         
-                         if neighbor_board_state[row + down_counter + 1][col] == '0':
-
-                            neighbor_board_state[row + down_counter][col] = '0'
-                            neighbor_board_state[row + down_counter + 1][col] = '1'
-                            neighbor_states_set.append(neighbor_board_state)
-
-                         down_counter += 1
-
-     return neighbor_states_set
-
-
-# Evaluates the fitness of a board state. Fitness == the number of pairwise attacks available on the board.
+# Evaluates the fitness of a board state. Returns fitness == the number of pairwise attacks available on the board.
+# Check all legal moves for each queen
 def evaluate_pairwise_fitness(board_state):
+
+     # Copy board state so that queens can be removed after finding an attack to achieve pairwise attacks
+     copy_board_state = copy.deepcopy(board_state)
      
      fitness_value = 0
      
@@ -79,14 +68,15 @@ def evaluate_pairwise_fitness(board_state):
           
           for row in range(8):
                
-               if board_state[row][col] == '1':
+               if copy_board_state[row][col] == '1':
                     
                     # Check horizontal moves to the left of the queen
                     left_moves_counter = 1
                     while is_valid_index(row, col - left_moves_counter):
 
-                        if board_state[row][col - left_moves_counter] == '1':
+                        if copy_board_state[row][col - left_moves_counter] == '1':
                              fitness_value += 1
+                             copy_board_state[row][col] = '0'
                              break
                         
                         left_moves_counter += 1
@@ -95,8 +85,9 @@ def evaluate_pairwise_fitness(board_state):
                     right_moves_counter = 1
                     while is_valid_index(row, col + right_moves_counter):
 
-                        if board_state[row][col + right_moves_counter] == '1':
+                        if copy_board_state[row][col + right_moves_counter] == '1':
                              fitness_value += 1
+                             copy_board_state[row][col] = '0'
                              break
                         
                         right_moves_counter += 1
@@ -105,8 +96,9 @@ def evaluate_pairwise_fitness(board_state):
                     down_moves_counter = 1
                     while is_valid_index(row + down_moves_counter, col):
 
-                        if board_state[row + down_moves_counter][col] == '1':
+                        if copy_board_state[row + down_moves_counter][col] == '1':
                              fitness_value += 1
+                             copy_board_state[row][col] = '0'
                              break
                         
                         down_moves_counter += 1
@@ -115,8 +107,9 @@ def evaluate_pairwise_fitness(board_state):
                     up_moves_counter = 1
                     while is_valid_index(row - up_moves_counter, col):
 
-                        if board_state[row - up_moves_counter][col] == '1':
+                        if copy_board_state[row - up_moves_counter][col] == '1':
                              fitness_value += 1
+                             copy_board_state[row][col] = '0'
                              break
                         
                         up_moves_counter += 1
@@ -125,8 +118,9 @@ def evaluate_pairwise_fitness(board_state):
                     down_left_moves_counter = 1
                     while is_valid_index(row + down_left_moves_counter, col - down_left_moves_counter):
 
-                        if board_state[row + down_left_moves_counter][col - down_left_moves_counter] == '1':
+                        if copy_board_state[row + down_left_moves_counter][col - down_left_moves_counter] == '1':
                              fitness_value += 1
+                             copy_board_state[row][col] = '0'
                              break
                         
                         down_left_moves_counter += 1
@@ -135,8 +129,9 @@ def evaluate_pairwise_fitness(board_state):
                     down_right_moves_counter = 1
                     while is_valid_index(row + down_right_moves_counter, col + down_right_moves_counter):
 
-                        if board_state[row + down_right_moves_counter][col + down_right_moves_counter] == '1':
+                        if copy_board_state[row + down_right_moves_counter][col + down_right_moves_counter] == '1':
                              fitness_value += 1
+                             copy_board_state[row][col] = '0'
                              break
                         
                         down_right_moves_counter += 1
@@ -145,8 +140,9 @@ def evaluate_pairwise_fitness(board_state):
                     up_left_moves_counter = 1
                     while is_valid_index(row - up_left_moves_counter, col - up_left_moves_counter):
 
-                        if board_state[row - up_left_moves_counter][col - up_left_moves_counter] == '1':
+                        if copy_board_state[row - up_left_moves_counter][col - up_left_moves_counter] == '1':
                              fitness_value += 1
+                             copy_board_state[row][col] = '0'
                              break
                         
                         up_left_moves_counter += 1
@@ -155,37 +151,16 @@ def evaluate_pairwise_fitness(board_state):
                     up_right_moves_counter = 1
                     while is_valid_index(row - up_right_moves_counter, col + up_right_moves_counter):
 
-                        if board_state[row - up_right_moves_counter][col + up_right_moves_counter] == '1':
+                        if copy_board_state[row - up_right_moves_counter][col + up_right_moves_counter] == '1':
                              fitness_value += 1
+                             copy_board_state[row][col] = '0'
                              break
                         
                         up_right_moves_counter += 1
 
      return fitness_value
 
-# Determines the most fit state from an initial state and its set of neighbor states
-# def find_most_fit_state(initial_state):
-       
-#        # Flag to determine if a new most fit state was found
-#        state_changed = False
-
-#        # Initial state starts as the most fit state
-#        most_fit_state = initial_state
-#        most_fit_state_value = evaluate_pairwise_fitness(initial_state)
-
-#        neighbor_states_set = generate_neighbor_states(initial_state)
-
-#        for i in range(0, len(neighbor_states_set)):
-            
-#             fitness = evaluate_pairwise_fitness(neighbor_states_set[i])
-
-#             if fitness < most_fit_state_value:
-#                  most_fit_state = neighbor_states_set[i]
-#                  most_fit_state_value = fitness
-#                  state_changed = True
-
-#        return state_changed, most_fit_state, most_fit_state_value
-
+# Returns whether a more fit state was found, which state was the most fit from an initial state and a set of neighbor states, and the fitness value of that state.
 def find_most_fit_state(initial_state):
     
     most_fit_state = initial_state
@@ -194,33 +169,77 @@ def find_most_fit_state(initial_state):
     neighbor_states_set = generate_neighbor_states(initial_state)
 
     for neighbor_state in neighbor_states_set:
+        
         fitness = evaluate_pairwise_fitness(neighbor_state)
 
         if fitness < most_fit_state_value:
             most_fit_state = neighbor_state
             most_fit_state_value = fitness
 
-    state_changed = most_fit_state != initial_state  # Check if the state changed
-
-    print(state_changed)
+    # Check if the state changed
+    state_changed = most_fit_state != initial_state
 
     return state_changed, most_fit_state, most_fit_state_value
 
 def print_board_state(board_state):
 
-    print("---------------\n")
-
     for row in board_state:
         print(' '.join(row))
 
-# Starting state
-state_to_check = generate_random_state(12)
-neighbor_state_set = generate_neighbor_states(state_to_check)
+    print("---------------")
 
-state_changed = True
+# Returns True if a solution was found
+def hill_climbing_search(num_queens, do_print):
 
-while state_changed:
-     
-    state_changed, state_to_check, state_to_check_fitness_value = find_most_fit_state(state_to_check)
-    print_board_state(state_to_check)
-    print(state_to_check_fitness_value)
+    # Generate starting state
+     state_to_check = generate_random_state(num_queens)
+
+     # Generate the set of neighbors to the initial state
+     neighbor_state_set = generate_neighbor_states(state_to_check)
+
+     # State was changed from null to starting state
+     state_changed = True
+
+     # Continue generating neighbors and checking fitness each time a more fit neighbor is found
+     while state_changed:
+          
+          state_changed, state_to_check, state_to_check_fitness_value = find_most_fit_state(state_to_check)
+
+     if do_print:
+
+          # Print the intitial state
+          print_board_state(state_to_check)
+          print("Fitness: " + str(evaluate_pairwise_fitness(state_to_check)) + '\n')
+          print("^^INITIAL STATE^^\n")
+
+          # Print the final state
+          print_board_state(state_to_check)
+          print("Fitness: " + str(state_to_check_fitness_value))
+          print("\n^^FINAL STATE^^\n")
+
+     solution_found = False
+
+     # If the fitness of the final state is 0, return that a solution was found
+     if state_to_check_fitness_value == 0:
+         solution_found = True
+
+     return solution_found
+
+num_solutions_found = 0
+
+# Run the search 100 times
+for i in range(100):
+    
+    # Print the initial and final states of the first 10 times
+    if i < 10:
+        #PARAMS: number of queens, print bool
+        solution_found = hill_climbing_search(32, True)
+    elif i >= 10:
+        #PARAMS: number of queens, print bool
+        solution_found = hill_climbing_search(32, False)
+
+    if solution_found:
+        num_solutions_found += 1
+
+print("Solutions Found: " + str(num_solutions_found))
+    
